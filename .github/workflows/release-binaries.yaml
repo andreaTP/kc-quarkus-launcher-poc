@@ -61,7 +61,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: code-with-quarkus-${{ matrix.os }}
-          path: target/code-with-quarkus-*-runner*
+          path: ./target/code-with-quarkus-*-runner*
       # - name: 'Upload executable'
       #   if: success()
       #   uses: actions/upload-artifact@v3
