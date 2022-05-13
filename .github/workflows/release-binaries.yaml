@@ -5,14 +5,12 @@ on:
 
 jobs:
   build-native-binary:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        fail-fast: false
         os: [ubuntu-latest, macos-latest, windows-latest]
         gu-binary: [gu, gu.cmd]
-        executable-path:
-          - ./target/code-with-quarkus-1.0.0-SNAPSHOT-runner
-          - .\target\code-with-quarkus-1.0.0-SNAPSHOT-runner.exe
+        executable-path: [./target/code-with-quarkus-1.0.0-SNAPSHOT-runner, .\target\code-with-quarkus-1.0.0-SNAPSHOT-runner.exe]
         exclude:
           - os: ubuntu-latest
             gu-binary: gu.cmd
@@ -23,6 +21,7 @@ jobs:
           - os: windows-latest
             gu-binary: gu
             executable-path: ./target/code-with-quarkus-1.0.0-SNAPSHOT-runner
+    runs-on: ${{ matrix.os }}
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v3
