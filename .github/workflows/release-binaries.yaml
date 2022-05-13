@@ -10,37 +10,49 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         gu-binary: [gu, gu.cmd]
-        executable-path: [./target/code-with-quarkus-1.0.0-SNAPSHOT-runner, .\target\code-with-quarkus-1.0.0-SNAPSHOT-runner.exe]
         exclude:
           - os: ubuntu-latest
             gu-binary: gu.cmd
-            executable-path: .\target\code-with-quarkus-1.0.0-SNAPSHOT-runner.exe
           - os: macos-latest
             gu-binary: gu.cmd
-            executable-path: .\target\code-with-quarkus-1.0.0-SNAPSHOT-runner.exe
           - os: windows-latest
             gu-binary: gu
-            executable-path: ./target/code-with-quarkus-1.0.0-SNAPSHOT-runner
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v3
-      - name: Setup Graalvm
-        id: setup-graalvm
-        uses: DeLaGuardo/setup-graalvm@master
+      - uses: graalvm/setup-graalvm@v1
         with:
-          graalvm: '22.1.0'
-          java: 'java11'
+          version: '22.1.0'
+          java-version: '11'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install native-image component
         run: |
           ${{ matrix.gu-binary }} install native-image
+
+      - name: 'Set up Visual C Build Tools Workload for Visual Studio 2019 Build Tools'
+        if: runner.os == 'Windows'
+        run: |
+          choco upgrade -y visualstudio2019-workload-vctools
+      - name: 'Build Native Image'
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+
       - name: Compile to native binaries
         run: |
           ./mvnw package -Pnative
-      - name: 'Upload executable'
-        if: success()
+      - name: Upload binary
         uses: actions/upload-artifact@v3
         with:
           name: code-with-quarkus-${{ matrix.os }}
-          path: ${{ matrix.executable-path }}
+          path: *target*code-with-quarkus*runner*
+      # - name: 'Upload executable'
+      #   if: success()
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: code-with-quarkus-${{ matrix.os }}
+      #     path: ${{ matrix.executable-path }}
