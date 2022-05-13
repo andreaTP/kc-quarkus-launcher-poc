@@ -55,16 +55,11 @@ jobs:
       #     echo "artifactPath=\"./target/code-with-quarkus-*-runner" >> $GITHUB_ENV
 
       - name: Compile to native binaries
-        run: ${{ env.mvnCmd }}
+        run: |
+          ./mvnw package -Pnative
 
       - name: Upload binary
         uses: actions/upload-artifact@v3
         with:
           name: code-with-quarkus-${{ matrix.os }}
           path: ./target/code-with-quarkus-*-runner*
-      # - name: 'Upload executable'
-      #   if: success()
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: code-with-quarkus-${{ matrix.os }}
-      #     path: ${{ matrix.executable-path }}
