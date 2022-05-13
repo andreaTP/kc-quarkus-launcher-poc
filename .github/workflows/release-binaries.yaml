@@ -56,10 +56,12 @@ jobs:
 
       - name: Compile to native binaries
         run: |
-          ./mvnw package -Pnative
+          # ./mvnw package -Pnative
+          mvn package -Pnative
 
       - name: Upload binary
         uses: actions/upload-artifact@v3
         with:
           name: code-with-quarkus-${{ matrix.os }}
           path: ./target/code-with-quarkus-*-runner*
+          if-no-files-found: error
