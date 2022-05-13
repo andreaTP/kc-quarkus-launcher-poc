@@ -42,14 +42,26 @@ jobs:
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
 
+      # - name: Setup Maven command and Artifact path on Win
+      #   if: runner.os == 'Windows'
+      #   run: |
+      #     echo "mvnCmd=\"cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat" && mvn package -Pnative'\"" >> $GITHUB_ENV
+      #     echo "artifactPath=\".\target\code-with-quarkus-*-runner.exe" >> $GITHUB_ENV
+
+      # - name: Setup Maven command and Artifact path on Linux and Mac
+      #   if: runner.os != 'Windows'
+      #   run: |
+      #     echo "mvnCmd=\"./mvnw package -Pnative\"" >> $GITHUB_ENV
+      #     echo "artifactPath=\"./target/code-with-quarkus-*-runner" >> $GITHUB_ENV
+
       - name: Compile to native binaries
-        run: |
-          ./mvnw package -Pnative
+        run: ${{ env.mvnCmd }}
+
       - name: Upload binary
         uses: actions/upload-artifact@v3
         with:
           name: code-with-quarkus-${{ matrix.os }}
-          path: target*code-with-quarkus*runner*
+          path: target/code-with-quarkus-*-runner*
       # - name: 'Upload executable'
       #   if: success()
       #   uses: actions/upload-artifact@v3
